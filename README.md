@@ -1,3 +1,29 @@
+# Assignment 1
+
+
+
+## Link to demo video
+![https://youtu.be/OcsuqwoJJ2E](Demo Video)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Week 2 REST Lab
 
 This project demonstrates a simple REST API built with Python's Flask framework. The API performs CRUD (Create, Read, Update, Delete) operations on user data, which can be tested locally and deployed to Azure App Service for cloud hosting.
@@ -447,4 +473,8 @@ To better understand how a REST API is built with Flask, go through the source c
    - Test your change with a sample request.
 
 This is not a graded activity.
+
+
+
+
 

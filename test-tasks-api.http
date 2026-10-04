@@ -1,0 +1,82 @@
+# 1. Get all tasks (Should return 200)
+GET http://localhost:8000/tasks
+Accept: application/json
+
+###
+
+# 2. Get a single task by ID (Should return 200)
+GET http://localhost:8000/tasks/1
+Accept: application/json
+
+###
+
+# 3. Get a task that does not exist (should return 404)
+GET http://localhost:8000/tasks/999
+Accept: application/json
+
+###
+
+# 4. Create a new task (Should return 201)
+POST http://localhost:8000/tasks
+Content-Type: application/json
+
+{
+    "title": "New task",
+    "description": "Creating a new test task",
+    "user_id": 1,
+    "done": false
+}
+
+###
+
+# 5. Post a task with missing title (should return 400)
+POST http://localhost:8000/tasks
+Content-Type: application/json
+
+{
+    "description": "Missing title field",
+    "user_id": 1,
+    "done": false
+}
+
+###
+
+# 6. Post a task with invalid user_id (should return 400)
+POST http://localhost:8000/tasks
+Content-Type: application/json
+
+{
+    "title": "Invalid user_id",
+    "description": "This task has an invalid user_id",
+    "user_id": abc,
+    "done": false
+}
+
+
+###
+
+# 7. Update an existing task (Should return 200)
+PUT http://localhost:8000/tasks/1
+Content-Type: application/json
+
+{
+    "title": "Updated task title",
+    "description": "Updated description for new task",
+    "user_id": 1,
+    "done": true
+}
+
+###
+
+# 8. Delete a task by ID (Should return 204)
+DELETE http://localhost:8000/tasks/1
+
+###
+
+# 9. Get tasks for a specific user (Should return 200)
+GET http://localhost:8000/users/1/tasks
+Content-Type: application/json
+
+
+
+

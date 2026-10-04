@@ -101,5 +101,126 @@ def delete_user(user_id):
 # Entry point for running the Flask app
 # The app will run on host 0.0.0.0 (accessible on all network interfaces) and port 8000.
 # Debug mode is disabled (set to False).
+
+
+
+#################################################################################################
+# Assignment 1 additions
+
+# Create tasks data to get retrieved
+tasks = [
+    {
+        "id": 1, 
+        "title": "Task 1", 
+        "description": "This is task 1", 
+        "user_id": 1,
+        "done": True
+    },
+
+    {
+        "id": 2, 
+        "title": "Task 2", 
+        "description": "This is task 2", 
+        "user_id": 2,
+        "done": False
+    },
+
+    {
+        "id": 3, 
+        "title": "Task 3", 
+        "description": "This is task 3", 
+        "user_id": 1,
+        "done": False
+    }
+]
+
+
+# Adding tasks resources to the API
+
+# Get all tasks
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    return jsonify(tasks), 200
+
+
+# Get a single task by ID
+@app.route('/tasks/<int:task_id>', methods=['GET'])
+def get_task(task_id):
+    # Using a list comprehension to find the task by ID
+    task = next((task for task in tasks if task['id'] == task_id), None)
+    if task is None:
+        abort(404)  # If the task is not found, return a 404 error (Not Found)
+    return jsonify(task), 200
+
+
+# Route to create a new task (POST request)
+# When the client sends a POST request to /tasks with task data, this function will add the new task to the list.
+@app.route('/tasks', methods=['POST'])
+def create_task():
+    # If the request body is not in JSON format or if the 'title' field is missing, return a 400 error (Bad Request)
+    if not request.json or not 'title' in request.json or not 'user_id' in request.json:
+        abort(400)
+    
+    # Create a new task dictionary. Assign the next available ID by incrementing the highest current ID.
+    # If no tasks exist, the new ID will be 1.
+    new_task = {
+        'id': tasks[-1]['id'] + 1 if tasks else 1,
+        'title': request.json['title'],
+        'description': request.json['description'],
+        'user_id': request.json['user_id'],
+        'done': request.json.get('done', False)
+    }
+    # Add the new task to the tasks list
+    tasks.append(new_task)
+    return jsonify(new_task), 201  # 201 is the HTTP status code for 'Created'
+
+
+# Route to update an existing task (PUT request)
+# When the client sends a PUT request to /tasks/<id> with updated task data, this function will update the task.
+@app.route('/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    # Find the task by its ID
+    task = next((task for task in tasks if task['id'] == task_id), None)
+    if task is None:
+        abort(404)  # If the task is not found, return a 404 error (Not Found)
+    
+    # If the request body is missing or not in JSON format, return a 400 error (Bad Request)
+    if not request.json:
+        abort(400)
+    
+    # Update the task's data based on the request body
+    # If a field is not provided in the request, keep the existing value
+    task['title'] = request.json.get('title', task['title'])
+    task['description'] = request.json.get('description', task['description'])
+    task['user_id'] = request.json.get('user_id', task['user_id'])
+    task['done'] = request.json.get('done', task['done'])
+    return jsonify(task), 200  # Return the updated task data with a 200 status code (OK)
+
+
+# Route to delete a task (DELETE request)
+# When the client sends a DELETE request to /tasks/<id>, this function will remove the task with that ID.
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    global tasks  # Reference the global tasks list
+    # Rebuild the tasks list, excluding the task with the specified ID
+    tasks = [task for task in tasks if task['id'] != task_id]
+    return '', 204  # 204 is the HTTP status code for 'No Content', indicating the deletion was successful
+
+
+# Get all tasks for a specific user
+@app.route('/users/<int:user_id>/tasks', methods=['GET'])
+def get_user_tasks(user_id):
+    # Check if the user exists
+    user = next((user for user in users if user['id'] == user_id), None)
+    if user is None:
+        abort(404)  # If the user is not found, return a 404 error (Not Found)
+    
+    # Filter tasks that belong to the specified user
+    user_tasks = [task for task in tasks if task['user_id'] == user_id]
+    return jsonify(user_tasks), 200  # Return the list of tasks for the user with a 200 status code (OK)
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8000)
